@@ -199,7 +199,8 @@ CSCoverSheetView* coverSheetView = nil;
 - (void)setText:(id)arg1 { // add a moon emoji next to the status bar time
 
 	if (!isDNDActive) return %orig;
-	if (isDNDActive && !([arg1 containsString:@"%"] || [arg1 containsString:@"2G"] || [arg1 containsString:@"3G"] || [arg1 containsString:@"4G"] || [arg1 containsString:@"5G"] || [arg1 containsString:@"LTE"] || [arg1 isEqualToString:@"E"] || [arg1 isEqualToString:@"e"])) return %orig([NSString stringWithFormat:@"%@ 🌙", arg1]);
+	if (isDNDActive && [arg1 containsString:@":"]) return %orig([NSString stringWithFormat:@"%@ 🌙", arg1]);
+	else return %orig;
 
 }
 
