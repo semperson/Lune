@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleExecutable</key>
-	<string>LunePrefs</string>
+	<string>LunePreferences</string>
 	<key>CFBundleIdentifier</key>
 	<string>love.litten.lunepreferences</string>
 	<key>CFBundleInfoDictionaryVersion</key>

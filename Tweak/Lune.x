@@ -2,104 +2,11 @@
 
 CSCoverSheetView* coverSheetView = nil;
 
-%group Lune
-
-%hook CSCoverSheetView
-
-%property(nonatomic, retain)UIImageView* luneView;
-%property(nonatomic, retain)UIView* luneDimView;
-
-- (id)initWithFrame:(CGRect)frame { // get an instance of cscoversheetview
-
-	id orig = %orig;
-	coverSheetView = self;
-
-	return orig;
-
-}
-
-- (void)didMoveToWindow { // add dim view
-
-	%orig;
-
-	if ([self luneView]) return;
-	self.luneView = [[UIImageView alloc] initWithFrame:CGRectMake([xPositionValue doubleValue], [yPositionValue doubleValue], [sizeValue doubleValue], [sizeValue doubleValue])];
-	[[self luneView] setImage:[[UIImage imageWithContentsOfFile:[NSString stringWithFormat:@"/Library/PreferenceBundles/LunePrefs.bundle/icon%d.png", [iconValue intValue]]] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
-	[[self luneView] setContentMode:UIViewContentModeScaleAspectFill];
-	[[self luneView] setAlpha:0.0];
-
-	// color
-	if (!useCustomColorSwitch) [[self luneView] setTintColor:[UIColor whiteColor]];
-	else if (useCustomColorSwitch) [[self luneView] setTintColor:[SparkColourPickerUtils colourWithString:[preferencesDictionary objectForKey:@"customColor"] withFallback:@"#FFFFFF"]];
-
-	// glow
-	if (glowSwitch) {
-		if (!useCustomGlowColorSwitch) [[[self luneView] layer] setShadowColor:[[UIColor whiteColor] CGColor]];
-		else if (useCustomGlowColorSwitch) [[[self luneView] layer] setShadowColor:[[SparkColourPickerUtils colourWithString:[preferencesDictionary objectForKey:@"customGlowColor"] withFallback:@"#FFFFFF"] CGColor]];
-		[[[self luneView] layer] setShadowOffset:CGSizeZero];
-		[[[self luneView] layer] setShadowRadius:[glowRadiusValue doubleValue]];
-		[[[self luneView] layer] setShadowOpacity:[glowAlphaValue doubleValue]];
-	}
-	
-	[self addSubview:[self luneView]];
-
-	if (darkenBackgroundSwitch) {
-		self.luneDimView = [[UIView alloc] initWithFrame:[self bounds]];
-		[[self luneDimView] setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
-		[[self luneDimView] setBackgroundColor:[UIColor blackColor]];
-		if (!alwaysDarkenBackgroundSwitch) [[self luneDimView] setAlpha:0.0];
-		else [[self luneDimView] setAlpha:[darkeningAmountValue doubleValue]];
-		[self insertSubview:[self luneDimView] atIndex:0];
-	}
-
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(toggleLuneVisibility:) name:@"toggleLuneVisibleNotification" object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(toggleLuneVisibility:) name:@"toggleLuneInvisibleNotification" object:nil];
-
-}
-
-- (void)viewWillAppear:(BOOL)animated { // update lune state when lockscreen appears
-
-	%orig;
-
-	[[NSNotificationCenter defaultCenter] postNotificationName:@"luneRefreshState" object:nil];
-
-}
-
-%new
-- (void)toggleLuneVisibility:(NSNotification *)notification { // toggle visibility
-
-	if ([notification.name isEqual:@"toggleLuneVisibleNotification"]) {
-		[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-			[[self luneView] setAlpha:1.0];
-			if (!alwaysDarkenBackgroundSwitch) [[self luneDimView] setAlpha:[darkeningAmountValue doubleValue]];
-		} completion:nil];
-	} else if ([notification.name isEqual:@"toggleLuneInvisibleNotification"]) {
-		[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-			[[self luneView] setAlpha:0.0];
-			if (!alwaysDarkenBackgroundSwitch) [[self luneDimView] setAlpha:0.0];
-		} completion:nil];
-	}
-
-}
-
-%end
-
-%hook DNDNotificationsService
-
-- (void)_queue_postOrRemoveNotificationWithUpdatedBehavior:(BOOL)arg1 significantTimeChange:(BOOL)arg2 { // hide dnd banner
-
-	if (hideDNDBannerSwitch)
-		return;
-	else
-		%orig;
-
-}
-
-%end
+%group LuneGlobal
 
 %hook DNDState
 
-- (id)initWithCoder:(id)arg1 { // add notification observer
+- (id)initWithCoder:(id)arg1 { // add a notification observer
 
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(isActive) name:@"luneRefreshState" object:nil];
@@ -108,15 +15,15 @@ CSCoverSheetView* coverSheetView = nil;
 
 }
 
-- (BOOL)isActive { // get do not disturb state
+- (BOOL)isActive { // get the do not disturb state
 
 	isDNDActive = %orig;
 
 	dispatch_async(dispatch_get_main_queue(), ^{
 		if (isDNDActive)
-			[[NSNotificationCenter defaultCenter] postNotificationName:@"toggleLuneVisibleNotification" object:nil];
+			[coverSheetView toggleLuneVisibility:YES];
 		else if (!isDNDActive)
-			[[NSNotificationCenter defaultCenter] postNotificationName:@"toggleLuneInvisibleNotification" object:nil];
+			[coverSheetView toggleLuneVisibility:NO];
 	});
 
 	return isDNDActive;
@@ -132,7 +39,7 @@ CSCoverSheetView* coverSheetView = nil;
 	%orig;
 
 	[[NSNotificationCenter defaultCenter] postNotificationName:@"luneRefreshState" object:nil];
-	if (useArtworkBasedColorSwitch) [[%c(SBMediaController) sharedInstance] setNowPlayingInfo:0];
+	if (enableIconSwitch && useArtworkBasedColorSwitch) [[%c(SBMediaController) sharedInstance] setNowPlayingInfo:0];
 
 }
 
@@ -140,7 +47,62 @@ CSCoverSheetView* coverSheetView = nil;
 
 %end
 
-%group LuneData
+%group LuneIcon
+
+%hook CSCoverSheetView
+
+%property(nonatomic, retain)UIImageView* luneView;
+
+- (id)initWithFrame:(CGRect)frame { // get an instance of cscoversheetview
+
+	id orig = %orig;
+	if (!coverSheetView) coverSheetView = self;
+
+	return orig;
+
+}
+
+- (void)didMoveToWindow { // add the lune icon
+
+	%orig;
+
+	if ([self luneView]) return;
+	self.luneView = [[UIImageView alloc] initWithFrame:CGRectMake([xPositionValue doubleValue], [yPositionValue doubleValue], [sizeValue doubleValue], [sizeValue doubleValue])];
+	[[self luneView] setImage:[[UIImage imageWithContentsOfFile:[NSString stringWithFormat:@"/Library/PreferenceBundles/LunePreferences.bundle/icons/icon%d.png", [iconValue intValue]]] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
+	[[self luneView] setContentMode:UIViewContentModeScaleAspectFill];
+	[[self luneView] setAlpha:0.0];
+
+	if (!useCustomColorSwitch) [[self luneView] setTintColor:[UIColor whiteColor]];
+	else if (useCustomColorSwitch) [[self luneView] setTintColor:[GcColorPickerUtils colorWithHex:customColorValue]];
+
+	if (glowSwitch) {
+		if (!useCustomGlowColorSwitch) [[[self luneView] layer] setShadowColor:[[UIColor whiteColor] CGColor]];
+		else if (useCustomGlowColorSwitch) [[[self luneView] layer] setShadowColor:[[GcColorPickerUtils colorWithHex:customGlowColorValue] CGColor]];
+		[[[self luneView] layer] setShadowOffset:CGSizeZero];
+		[[[self luneView] layer] setShadowRadius:[glowRadiusValue doubleValue]];
+		[[[self luneView] layer] setShadowOpacity:[glowAlphaValue doubleValue]];
+	}
+	
+	[self addSubview:[self luneView]];
+
+}
+
+%new
+- (void)toggleLuneVisibility:(BOOL)visible { // toggle visibility
+
+	if (visible) {
+		[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+			[[self luneView] setAlpha:1.0];
+		} completion:nil];
+	} else {
+		[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+			[[self luneView] setAlpha:0.0];
+		} completion:nil];
+	}
+
+}
+
+%end
 
 %hook SBMediaController
 
@@ -148,6 +110,7 @@ CSCoverSheetView* coverSheetView = nil;
 
     %orig;
 
+	if (!useArtworkBasedColorSwitch) return;
     MRMediaRemoteGetNowPlayingInfo(dispatch_get_main_queue(), ^(CFDictionaryRef information) {
         if (information) {
             NSDictionary* dict = (__bridge NSDictionary *)information;
@@ -168,9 +131,9 @@ CSCoverSheetView* coverSheetView = nil;
 				[[coverSheetView luneView] setTintColor:[UIColor whiteColor]];
 				[[[coverSheetView luneView] layer] setShadowColor:[[UIColor whiteColor] CGColor]];
 			} else if (useCustomColorSwitch) {
-				[[coverSheetView luneView] setTintColor:[SparkColourPickerUtils colourWithString:[preferencesDictionary objectForKey:@"customColor"] withFallback:@"#FFFFFF"]];
+				[[coverSheetView luneView] setTintColor:[GcColorPickerUtils colorWithHex:customColorValue]];
 				if (!useCustomGlowColorSwitch) [[[coverSheetView luneView] layer] setShadowColor:[[UIColor whiteColor] CGColor]];
-				else if (useCustomGlowColorSwitch) [[[coverSheetView luneView] layer] setShadowColor:[[SparkColourPickerUtils colourWithString:[preferencesDictionary objectForKey:@"customGlowColor"] withFallback:@"#FFFFFF"] CGColor]];
+				else if (useCustomGlowColorSwitch) [[[coverSheetView luneView] layer] setShadowColor:[[GcColorPickerUtils colorWithHex:customGlowColorValue] CGColor]];
 			}
         }
   	});
@@ -181,43 +144,129 @@ CSCoverSheetView* coverSheetView = nil;
 
 %end
 
+%group LuneBackground
+
+%hook CSCoverSheetView
+
+%property(nonatomic, retain)UIView* luneDimView;
+
+- (id)initWithFrame:(CGRect)frame { // get an instance of cscoversheetview
+
+	id orig = %orig;
+	if (!coverSheetView) coverSheetView = self;
+
+	return orig;
+
+}
+
+- (void)didMoveToWindow { // add lune dim view
+
+	%orig;
+
+	if ([self luneDimView]) return;
+	self.luneDimView = [[UIView alloc] initWithFrame:[self bounds]];
+	[[self luneDimView] setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
+	[[self luneDimView] setBackgroundColor:[UIColor blackColor]];
+	if (!alwaysDarkenBackgroundSwitch) [[self luneDimView] setAlpha:0.0];
+	else [[self luneDimView] setAlpha:[darkeningAmountValue doubleValue]];
+	[self insertSubview:[self luneDimView] atIndex:0];
+
+}
+
+%new
+- (void)toggleLuneVisibility:(BOOL)visible { // toggle visibility
+
+	if (visible) {
+		[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+			if (!alwaysDarkenBackgroundSwitch) [[self luneDimView] setAlpha:[darkeningAmountValue doubleValue]];
+		} completion:nil];
+	} else {
+		[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+			if (!alwaysDarkenBackgroundSwitch) [[self luneDimView] setAlpha:0.0];
+		} completion:nil];
+	}
+
+}
+
+%end
+
+%end
+
+%group LuneStatusBar
+
+%hook _UIStatusBarStringView
+
+- (void)setText:(id)arg1 { // add a moon emoji next to the status bar time
+
+	if (!isDNDActive) return %orig;
+	if (isDNDActive && !([arg1 containsString:@"%"] || [arg1 containsString:@"2G"] || [arg1 containsString:@"3G"] || [arg1 containsString:@"4G"] || [arg1 containsString:@"5G"] || [arg1 containsString:@"LTE"] || [arg1 isEqualToString:@"E"] || [arg1 isEqualToString:@"e"])) return %orig([NSString stringWithFormat:@"%@ 🌙", arg1]);
+
+}
+
+%end
+
+%end
+
+%group LuneMiscellaneous
+
+%hook DNDNotificationsService
+
+- (void)_queue_postOrRemoveNotificationWithUpdatedBehavior:(BOOL)arg1 significantTimeChange:(BOOL)arg2 { // hide the dnd banner
+
+	if (hideDNDBannerSwitch)
+		return;
+	else
+		%orig;
+
+}
+
+%end
+
+%end
+
 %ctor {
 
 	preferences = [[HBPreferences alloc] initWithIdentifier:@"love.litten.lunepreferences"];
-	preferencesDictionary = [NSDictionary dictionaryWithContentsOfFile: @"/var/mobile/Library/Preferences/love.litten.lune.colorspreferences.plist"];
 	
 	[preferences registerBool:&enabled default:NO forKey:@"Enabled"];
 	if (!enabled) return;
 
 	// icon
-	[preferences registerObject:&xPositionValue default:@"150.0" forKey:@"xPosition"];
-	[preferences registerObject:&yPositionValue default:@"100.0" forKey:@"yPosition"];
-	[preferences registerObject:&sizeValue default:@"50.0" forKey:@"size"];
-	[preferences registerObject:&iconValue default:@"0" forKey:@"icon"];
-
-	// glow
-	[preferences registerBool:&glowSwitch default:YES forKey:@"glow"];
-	if (glowSwitch) {
-		[preferences registerBool:&useCustomGlowColorSwitch default:NO forKey:@"useCustomGlowColor"];
-		[preferences registerObject:&glowRadiusValue default:@"10.0" forKey:@"glowRadius"];
-		[preferences registerObject:&glowAlphaValue default:@"1.0" forKey:@"glowAlpha"];
+	[preferences registerBool:&enableIconSwitch default:YES forKey:@"enableIcon"];
+	if (enableIconSwitch) {
+		[preferences registerObject:&xPositionValue default:@"150.0" forKey:@"xPosition"];
+		[preferences registerObject:&yPositionValue default:@"100.0" forKey:@"yPosition"];
+		[preferences registerObject:&sizeValue default:@"50.0" forKey:@"size"];
+		[preferences registerObject:&iconValue default:@"0" forKey:@"icon"];
+		[preferences registerObject:&customColorValue default:@"FFFFFF" forKey:@"customColor"];
+		[preferences registerBool:&glowSwitch default:YES forKey:@"glow"];
+		if (glowSwitch) {
+			[preferences registerBool:&useCustomGlowColorSwitch default:NO forKey:@"useCustomGlowColor"];
+			[preferences registerObject:&customGlowColorValue default:@"FFFFFF" forKey:@"customGlowColor"];
+			[preferences registerObject:&glowRadiusValue default:@"10.0" forKey:@"glowRadius"];
+			[preferences registerObject:&glowAlphaValue default:@"1.0" forKey:@"glowAlpha"];
+		}
+		[preferences registerBool:&useCustomColorSwitch default:NO forKey:@"useCustomColor"];
+		[preferences registerBool:&useArtworkBasedColorSwitch default:YES forKey:@"useArtworkBasedColor"];
 	}
-
-	// colors
-	[preferences registerBool:&useCustomColorSwitch default:NO forKey:@"useCustomColor"];
-	[preferences registerBool:&useArtworkBasedColorSwitch default:YES forKey:@"useArtworkBasedColor"];
 
 	// background
 	[preferences registerBool:&darkenBackgroundSwitch default:YES forKey:@"darkenBackground"];
-	if (darkenBackgroundSwitch) {
-		[preferences registerBool:&alwaysDarkenBackgroundSwitch default:NO forKey:@"alwaysDarkenBackground"];
+	[preferences registerBool:&alwaysDarkenBackgroundSwitch default:NO forKey:@"alwaysDarkenBackground"];
+	if (darkenBackgroundSwitch || alwaysDarkenBackgroundSwitch) {
 		[preferences registerObject:&darkeningAmountValue default:@"0.5" forKey:@"darkeningAmount"];
 	}
+
+	// status bar
+	[preferences registerBool:&showStatusBarIconSwitch default:NO forKey:@"showStatusBarIcon"];
 
 	// miscellaneous
 	[preferences registerBool:&hideDNDBannerSwitch default:NO forKey:@"hideDNDBanner"];
 
-	%init(Lune);
-	if (useArtworkBasedColorSwitch) %init(LuneData);
+	if (enableIconSwitch || (darkenBackgroundSwitch || alwaysDarkenBackgroundSwitch) || showStatusBarIconSwitch) %init(LuneGlobal);
+	if (enableIconSwitch) %init(LuneIcon);
+	if (darkenBackgroundSwitch || alwaysDarkenBackgroundSwitch) %init(LuneBackground);
+	if (showStatusBarIconSwitch) %init(LuneStatusBar);
+	if (hideDNDBannerSwitch) %init(LuneMiscellaneous);
 
 }
