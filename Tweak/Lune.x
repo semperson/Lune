@@ -4,6 +4,37 @@ CSCoverSheetView* coverSheetView = nil;
 
 %group LuneGlobal
 
+%hook CSCoverSheetView
+
+- (id)initWithFrame:(CGRect)frame { // get an instance of cscoversheetview
+
+	if (!enableIconSwitch && (!darkenBackgroundSwitch && !alwaysDarkenBackgroundSwitch)) return %orig;
+	id orig = %orig;
+	coverSheetView = self;
+
+	return orig;
+
+}
+
+%new
+- (void)toggleLuneVisibility:(BOOL)visible { // toggle visibility
+
+	if (visible) {
+		[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+			if (enableIconSwitch) [[self luneView] setAlpha:1.0];
+			if ((darkenBackgroundSwitch || alwaysDarkenBackgroundSwitch) && !alwaysDarkenBackgroundSwitch) [[self luneDimView] setAlpha:[darkeningAmountValue doubleValue]];
+		} completion:nil];
+	} else {
+		[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+			if (enableIconSwitch) [[self luneView] setAlpha:0.0];
+			if ((darkenBackgroundSwitch || alwaysDarkenBackgroundSwitch) && !alwaysDarkenBackgroundSwitch) [[self luneDimView] setAlpha:0.0];
+		} completion:nil];
+	}
+
+}
+
+%end
+
 %hook DNDState
 
 - (id)initWithCoder:(id)arg1 { // add a notification observer
@@ -53,15 +84,6 @@ CSCoverSheetView* coverSheetView = nil;
 
 %property(nonatomic, retain)UIImageView* luneView;
 
-- (id)initWithFrame:(CGRect)frame { // get an instance of cscoversheetview
-
-	id orig = %orig;
-	if (!coverSheetView) coverSheetView = self;
-
-	return orig;
-
-}
-
 - (void)didMoveToWindow { // add the lune icon
 
 	%orig;
@@ -84,21 +106,6 @@ CSCoverSheetView* coverSheetView = nil;
 	}
 	
 	[self addSubview:[self luneView]];
-
-}
-
-%new
-- (void)toggleLuneVisibility:(BOOL)visible { // toggle visibility
-
-	if (visible) {
-		[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-			[[self luneView] setAlpha:1.0];
-		} completion:nil];
-	} else {
-		[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-			[[self luneView] setAlpha:0.0];
-		} completion:nil];
-	}
 
 }
 
@@ -150,15 +157,6 @@ CSCoverSheetView* coverSheetView = nil;
 
 %property(nonatomic, retain)UIView* luneDimView;
 
-- (id)initWithFrame:(CGRect)frame { // get an instance of cscoversheetview
-
-	id orig = %orig;
-	if (!coverSheetView) coverSheetView = self;
-
-	return orig;
-
-}
-
 - (void)didMoveToWindow { // add lune dim view
 
 	%orig;
@@ -170,21 +168,6 @@ CSCoverSheetView* coverSheetView = nil;
 	if (!alwaysDarkenBackgroundSwitch) [[self luneDimView] setAlpha:0.0];
 	else [[self luneDimView] setAlpha:[darkeningAmountValue doubleValue]];
 	[self insertSubview:[self luneDimView] atIndex:0];
-
-}
-
-%new
-- (void)toggleLuneVisibility:(BOOL)visible { // toggle visibility
-
-	if (visible) {
-		[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-			if (!alwaysDarkenBackgroundSwitch) [[self luneDimView] setAlpha:[darkeningAmountValue doubleValue]];
-		} completion:nil];
-	} else {
-		[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-			if (!alwaysDarkenBackgroundSwitch) [[self luneDimView] setAlpha:0.0];
-		} completion:nil];
-	}
 
 }
 
