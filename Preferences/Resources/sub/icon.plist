@@ -40,15 +40,15 @@
 			<key>cell</key>
 			<string>PSSliderCell</string>
 			<key>default</key>
-			<real>150.0</real>
+			<real>150</real>
 			<key>defaults</key>
 			<string>love.litten.lunepreferences</string>
 			<key>key</key>
 			<string>xPosition</string>
 			<key>min</key>
-			<real>-100.0</real>
+			<real>-100</real>
 			<key>max</key>
-			<real>400.0</real>
+			<real>400</real>
 			<key>showValue</key>
 			<true/>
 			<key>isSegmented</key>
@@ -64,15 +64,15 @@
 			<key>cell</key>
 			<string>PSSliderCell</string>
 			<key>default</key>
-			<real>100.0</real>
+			<real>100</real>
 			<key>defaults</key>
 			<string>love.litten.lunepreferences</string>
 			<key>key</key>
 			<string>yPosition</string>
 			<key>min</key>
-			<real>-100.0</real>
+			<real>-100</real>
 			<key>max</key>
-			<real>1000.0</real>
+			<real>1000</real>
 			<key>showValue</key>
 			<true/>
 			<key>isSegmented</key>
@@ -88,15 +88,15 @@
 			<key>cell</key>
 			<string>PSSliderCell</string>
 			<key>default</key>
-			<real>50.0</real>
+			<real>50</real>
 			<key>defaults</key>
 			<string>love.litten.lunepreferences</string>
 			<key>key</key>
 			<string>size</string>
 			<key>min</key>
-			<real>1.0</real>
+			<real>1</real>
 			<key>max</key>
-			<real>100.0</real>
+			<real>100</real>
 			<key>showValue</key>
 			<true/>
 			<key>isSegmented</key>
@@ -232,15 +232,15 @@
 			<key>cell</key>
 			<string>PSSliderCell</string>
 			<key>default</key>
-			<real>10.0</real>
+			<real>10</real>
 			<key>defaults</key>
 			<string>love.litten.lunepreferences</string>
 			<key>key</key>
 			<string>glowRadius</string>
 			<key>min</key>
-			<real>0.0</real>
+			<real>0</real>
 			<key>max</key>
-			<real>20.0</real>
+			<real>20</real>
 			<key>showValue</key>
 			<true/>
 			<key>isSegmented</key>
@@ -256,15 +256,15 @@
 			<key>cell</key>
 			<string>PSSliderCell</string>
 			<key>default</key>
-			<real>1.0</real>
+			<real>1</real>
 			<key>defaults</key>
 			<string>love.litten.lunepreferences</string>
 			<key>key</key>
 			<string>glowAlpha</string>
 			<key>min</key>
-			<real>0.0</real>
+			<real>0</real>
 			<key>max</key>
-			<real>1.0</real>
+			<real>1</real>
 			<key>showValue</key>
 			<true/>
 			<key>isSegmented</key>

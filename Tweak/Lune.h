@@ -12,16 +12,16 @@ UIColor* backgroundArtworkColor = nil;
 
 // icon
 BOOL enableIconSwitch = YES;
-NSString* xPositionValue = @"150.0";
-NSString* yPositionValue = @"100.0";
-NSString* sizeValue = @"50.0";
+NSString* xPositionValue = @"150";
+NSString* yPositionValue = @"100";
+NSString* sizeValue = @"50";
 NSString* iconValue = @"0";
 NSString* customColorValue = @"FFFFFF";
 BOOL glowSwitch = YES;
 BOOL useCustomGlowColorSwitch = NO;
 NSString* customGlowColorValue = @"FFFFFF";
-NSString* glowRadiusValue = @"10.0";
-NSString* glowAlphaValue = @"1.0";
+NSString* glowRadiusValue = @"10";
+NSString* glowAlphaValue = @"1";
 BOOL useCustomColorSwitch = NO;
 BOOL useArtworkBasedColorSwitch = YES;
 

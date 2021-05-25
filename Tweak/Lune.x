@@ -20,14 +20,14 @@ CSCoverSheetView* coverSheetView = nil;
 - (void)toggleLuneVisibility:(BOOL)visible { // toggle visibility
 
 	if (visible) {
-		[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-			if (enableIconSwitch) [[self luneView] setAlpha:1.0];
+		[UIView animateWithDuration:0.2 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+			if (enableIconSwitch) [[self luneView] setAlpha:1];
 			if ((darkenBackgroundSwitch || alwaysDarkenBackgroundSwitch) && !alwaysDarkenBackgroundSwitch) [[self luneDimView] setAlpha:[darkeningAmountValue doubleValue]];
 		} completion:nil];
 	} else {
-		[UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-			if (enableIconSwitch) [[self luneView] setAlpha:0.0];
-			if ((darkenBackgroundSwitch || alwaysDarkenBackgroundSwitch) && !alwaysDarkenBackgroundSwitch) [[self luneDimView] setAlpha:0.0];
+		[UIView animateWithDuration:0.2 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+			if (enableIconSwitch) [[self luneView] setAlpha:0];
+			if ((darkenBackgroundSwitch || alwaysDarkenBackgroundSwitch) && !alwaysDarkenBackgroundSwitch) [[self luneDimView] setAlpha:0];
 		} completion:nil];
 	}
 
@@ -92,7 +92,7 @@ CSCoverSheetView* coverSheetView = nil;
 	self.luneView = [[UIImageView alloc] initWithFrame:CGRectMake([xPositionValue doubleValue], [yPositionValue doubleValue], [sizeValue doubleValue], [sizeValue doubleValue])];
 	[[self luneView] setImage:[[UIImage imageWithContentsOfFile:[NSString stringWithFormat:@"/Library/PreferenceBundles/LunePreferences.bundle/icons/icon%d.png", [iconValue intValue]]] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
 	[[self luneView] setContentMode:UIViewContentModeScaleAspectFill];
-	[[self luneView] setAlpha:0.0];
+	[[self luneView] setAlpha:0];
 
 	if (!useCustomColorSwitch) [[self luneView] setTintColor:[UIColor whiteColor]];
 	else if (useCustomColorSwitch) [[self luneView] setTintColor:[GcColorPickerUtils colorWithHex:customColorValue]];
@@ -165,7 +165,7 @@ CSCoverSheetView* coverSheetView = nil;
 	self.luneDimView = [[UIView alloc] initWithFrame:[self bounds]];
 	[[self luneDimView] setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
 	[[self luneDimView] setBackgroundColor:[UIColor blackColor]];
-	if (!alwaysDarkenBackgroundSwitch) [[self luneDimView] setAlpha:0.0];
+	if (!alwaysDarkenBackgroundSwitch) [[self luneDimView] setAlpha:0];
 	else [[self luneDimView] setAlpha:[darkeningAmountValue doubleValue]];
 	[self insertSubview:[self luneDimView] atIndex:0];
 
@@ -218,17 +218,17 @@ CSCoverSheetView* coverSheetView = nil;
 	// icon
 	[preferences registerBool:&enableIconSwitch default:YES forKey:@"enableIcon"];
 	if (enableIconSwitch) {
-		[preferences registerObject:&xPositionValue default:@"150.0" forKey:@"xPosition"];
-		[preferences registerObject:&yPositionValue default:@"100.0" forKey:@"yPosition"];
-		[preferences registerObject:&sizeValue default:@"50.0" forKey:@"size"];
+		[preferences registerObject:&xPositionValue default:@"150" forKey:@"xPosition"];
+		[preferences registerObject:&yPositionValue default:@"100" forKey:@"yPosition"];
+		[preferences registerObject:&sizeValue default:@"50" forKey:@"size"];
 		[preferences registerObject:&iconValue default:@"0" forKey:@"icon"];
 		[preferences registerObject:&customColorValue default:@"FFFFFF" forKey:@"customColor"];
 		[preferences registerBool:&glowSwitch default:YES forKey:@"glow"];
 		if (glowSwitch) {
 			[preferences registerBool:&useCustomGlowColorSwitch default:NO forKey:@"useCustomGlowColor"];
 			[preferences registerObject:&customGlowColorValue default:@"FFFFFF" forKey:@"customGlowColor"];
-			[preferences registerObject:&glowRadiusValue default:@"10.0" forKey:@"glowRadius"];
-			[preferences registerObject:&glowAlphaValue default:@"1.0" forKey:@"glowAlpha"];
+			[preferences registerObject:&glowRadiusValue default:@"10" forKey:@"glowRadius"];
+			[preferences registerObject:&glowAlphaValue default:@"1" forKey:@"glowAlpha"];
 		}
 		[preferences registerBool:&useCustomColorSwitch default:NO forKey:@"useCustomColor"];
 		[preferences registerBool:&useArtworkBasedColorSwitch default:YES forKey:@"useArtworkBasedColor"];
