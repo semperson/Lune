@@ -33,8 +33,9 @@ NSString* darkeningAmountValue = @"0.5";
 // status bar
 BOOL showStatusBarIconSwitch = NO;
 
-// miscellaneous
+// banner
 BOOL hideDNDBannerSwitch = NO;
+BOOL indicatorPillSwitch = NO;
 
 @interface CSCoverSheetView : UIView
 @property(nonatomic, retain)UIImageView* luneView;

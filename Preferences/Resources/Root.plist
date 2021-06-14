@@ -64,11 +64,11 @@
  			<key>cell</key>
  			<string>PSLinkCell</string>
  			<key>label</key>
- 			<string>Miscellaneous</string>
+ 			<string>Banner</string>
  			<key>detail</key>
- 			<string>LNEMiscellaneousSubPreferencesListController</string>
+ 			<string>LNEBannerSubPreferencesListController</string>
  			<key>LNESub</key>
- 			<string>sub/miscellaneous</string>
+ 			<string>sub/banner</string>
  		</dict>
 
 		<dict>

@@ -1,6 +1,6 @@
-#import "LNEMiscellaneousSubPreferencesListController.h"
+#import "LNEBannerSubPreferencesListController.h"
 
-@implementation LNEMiscellaneousSubPreferencesListController
+@implementation LNEBannerSubPreferencesListController
 
 - (void)viewDidLoad {
 

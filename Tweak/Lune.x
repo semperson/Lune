@@ -191,7 +191,7 @@ CSCoverSheetView* coverSheetView = nil;
 
 %end
 
-%group LuneMiscellaneous
+%group LuneBanner
 
 %hook DNDNotificationsService
 
@@ -244,13 +244,14 @@ CSCoverSheetView* coverSheetView = nil;
 	// status bar
 	[preferences registerBool:&showStatusBarIconSwitch default:NO forKey:@"showStatusBarIcon"];
 
-	// miscellaneous
+	// banner
 	[preferences registerBool:&hideDNDBannerSwitch default:NO forKey:@"hideDNDBanner"];
+	[preferences registerBool:&indicatorPillSwitch default:NO forKey:@"indicatorPill"];
 
 	if (enableIconSwitch || (darkenBackgroundSwitch || alwaysDarkenBackgroundSwitch) || showStatusBarIconSwitch) %init(LuneGlobal);
 	if (enableIconSwitch) %init(LuneIcon);
 	if (darkenBackgroundSwitch || alwaysDarkenBackgroundSwitch) %init(LuneBackground);
 	if (showStatusBarIconSwitch) %init(LuneStatusBar);
-	if (hideDNDBannerSwitch) %init(LuneMiscellaneous);
+	if (hideDNDBannerSwitch || indicatorPillSwitch) %init(LuneBanner);
 
 }
