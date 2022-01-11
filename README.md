@@ -2,13 +2,13 @@
 Twinkle twinkle little star
 
 ## Installation
-1. Add this repository to your Package Manager: `TBD`
+1. Add this repository to your package manager: `TBD`
 2. Install Lune
 
 ## Compiling
   - [Theos](https://theos.dev/) is required to compile the project
   - Depends on [libKitten](https://github.com/schneelittchen/libKitten) and [libGCUniversal](https://github.com/MrGcGamer/LibGcUniversalDocumentation)
-  - You may want to edit the root `Makefile` to use your Theos SDK and custom toolchain
+  - You may want to edit the root `Makefile` to use your Theos SDK and toolchain
 
 ## License
 If you take code from this repository please link it, or my [Twitter](https://twitter.com/schneelittchen) to your project<br>
