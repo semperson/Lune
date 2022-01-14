@@ -1,4 +1,4 @@
-# Lune
+# Lune 🌙
 Twinkle twinkle little star
 
 ## Installation
